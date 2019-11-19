@@ -33,19 +33,21 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
-public:
-    afx_msg void OnCbnSelchangeCombo1();
+
     CListCtrl m_wndList;
-    afx_msg void OnBnClickedButtonAdd();
-    afx_msg void OnBnClickedButtonDel();
-    afx_msg void OnBnClickedButtonExit();
     CComboBox m_wndComb;
     CEdit m_remark;
     CDateTimeCtrl m_time;
-    afx_msg void OnCbnSelchangeCombo3();
-    void ChangeList(int type);
-
     CComboBox m_weekDay;
-    
+
     CTimerManager m_timerManager;
+
+public:
+    afx_msg void OnCbnSelchangeCombo1();
+    afx_msg void OnCbnSelchangeCombo3();
+    afx_msg void OnBnClickedButtonAdd();
+    afx_msg void OnBnClickedButtonDel();
+    afx_msg void OnBnClickedButtonExit();
+
+    void ChangeList(int type);
 };

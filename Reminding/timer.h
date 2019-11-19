@@ -32,9 +32,9 @@ public:
 
         return m_index;
     }
+
+    
 private:
     int m_index{ 0 };
     std::map<int, spTimer> m_map;
-
-
 };
