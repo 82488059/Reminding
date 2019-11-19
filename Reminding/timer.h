@@ -33,7 +33,7 @@ public:
         return m_index;
     }
 
-    int AnalysisNext()
+    int AnalysisTimer()
     {
         return 0;
     }
