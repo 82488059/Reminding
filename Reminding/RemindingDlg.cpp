@@ -233,7 +233,6 @@ void CRemindingDlg::OnBnClickedButtonAdd()
         int s = t.GetSecond();
         szDescription.Format(_T("%d时%d分%d秒"), h, m, s);
         nType = timer::em_day;
-
     }
     else if (_T("每周") == szType)
     {
@@ -252,7 +251,7 @@ void CRemindingDlg::OnBnClickedButtonAdd()
         int m = t.GetMinute();
         int s = t.GetSecond();
         szDescription.Format(_T("%s号 %d时%d分%d秒"), szDay, h, m, s);
-        nType = timer::em_day;
+        nType = timer::em_month;
     }
     else
     {
@@ -291,6 +290,7 @@ void CRemindingDlg::OnBnClickedButtonDel()
 void CRemindingDlg::OnBnClickedButtonExit()
 {
     // TODO: 在此添加控件通知处理程序代码
+    OnClose();
 }
 
 
