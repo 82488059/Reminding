@@ -33,7 +33,10 @@ public:
         return m_index;
     }
 
-    
+    int AnalysisNext()
+    {
+        return 0;
+    }
 private:
     int m_index{ 0 };
     std::map<int, spTimer> m_map;
