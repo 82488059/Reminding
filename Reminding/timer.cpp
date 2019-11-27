@@ -68,7 +68,7 @@ __time64_t timer::WillRing()
     {
         next64 = next64 - (next64 % 86400);
 
-        int week = now.GetDayOfWeek();
+        int week = stLocal.wDayOfWeek;
 
         int nday = 0;
         if (week > m_time.wDayOfWeek)
