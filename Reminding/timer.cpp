@@ -27,8 +27,8 @@ __time64_t timer::WillRing()
     case em_hour:
     {
         next64 = next64 - (next64 % 3600);
-        WORD nsec = (now64 % 3600);
-        WORD sec = m_time.wMinute * 60 + m_time.wSecond;
+        DWORD nsec = (now64 % 3600);
+        DWORD sec = m_time.wMinute * 60 + m_time.wSecond;
         if (nsec < sec)
         {
             next64 += sec;
@@ -49,7 +49,7 @@ __time64_t timer::WillRing()
         next64 = next64 - (next64 % 86400);
         DWORD zsec = timezone * 3600;
         DWORD nowsec = now64 % 86400;
-        WORD nextsec = m_time.wHour * 60 * 60 + m_time.wMinute * 60 + m_time.wSecond - zsec;
+        DWORD nextsec = m_time.wHour * 60 * 60 + m_time.wMinute * 60 + m_time.wSecond - zsec;
         if (nowsec > nextsec)
         {
             next64 += 86400 + nextsec;
@@ -67,13 +67,24 @@ __time64_t timer::WillRing()
     case em_week:
     {
         next64 = next64 - (next64 % 86400);
+
         int week = now.GetDayOfWeek();
-        int nday = (m_time.wDayOfWeek - week + 7) % 7;
-        WORD nsec = m_time.wHour * 60 * 60 + m_time.wMinute * 60 + m_time.wSecond;
-        nsec += nday * 86400;
+
+        int nday = 0;
+        if (week > m_time.wDayOfWeek)
+        {
+            nday = m_time.wDayOfWeek + 7 - week;
+        }
+        else
+        {
+            nday = m_time.wDayOfWeek - week;
+        }
+
+        DWORD nsec = nday * 24 * 60*60
+            + m_time.wHour * 60 * 60 + m_time.wMinute * 60 + m_time.wSecond 
+            - timezone*3600;
         next64 += nsec;
         CTime t(next64);
-
         TRACE(_T("%s\n"), t.Format(_T("%Y-%m-%d %H:%M:%S %w-%A")));
 
         m_nextTime = next64;
