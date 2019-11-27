@@ -217,11 +217,16 @@ void CRemindingDlg::OnBnClickedButtonAdd()
 
     int nType = 0;
     CTime t;
+    SYSTEMTIME stLocal;
+    memset(&stLocal, 0, sizeof(stLocal));
+
     if (_T("每小时") == szType)
     {
         m_time.GetTime(t);
         int m = t.GetMinute();
         int s = t.GetSecond();
+        stLocal.wMinute = m;
+        stLocal.wSecond = s;
         szDescription.Format(_T("%d分%d秒"), m, s);
         nType = timer::em_hour;
     }
@@ -231,6 +236,9 @@ void CRemindingDlg::OnBnClickedButtonAdd()
         int h = t.GetHour();
         int m = t.GetMinute();
         int s = t.GetSecond();
+        stLocal.wHour = h;
+        stLocal.wMinute = m;
+        stLocal.wSecond = s;
         szDescription.Format(_T("%d时%d分%d秒"), h, m, s);
         nType = timer::em_day;
     }
@@ -240,6 +248,38 @@ void CRemindingDlg::OnBnClickedButtonAdd()
         int h = t.GetHour();
         int m = t.GetMinute();
         int s = t.GetSecond();
+        stLocal.wHour = h;
+        stLocal.wMinute = m;
+        stLocal.wSecond = s;
+        if (szDay == _T("星期一"))
+        {
+            stLocal.wDayOfWeek = 1;
+        }
+        else if (szDay == _T("星期二"))
+        {
+            stLocal.wDayOfWeek = 2;
+        }
+        else if (szDay == _T("星期三"))
+        {
+            stLocal.wDayOfWeek = 3;
+        }
+        else if (szDay == _T("星期四"))
+        {
+            stLocal.wDayOfWeek = 4;
+        }
+        else if (szDay == _T("星期五"))
+        {
+            stLocal.wDayOfWeek = 5;
+        }
+        else if (szDay == _T("星期六"))
+        {
+            stLocal.wDayOfWeek = 6;
+        }
+        else if (szDay == _T("星期日"))
+        {
+            stLocal.wDayOfWeek = 7;
+        }
+
         szDescription.Format(_T("%s %d时%d分%d秒"), szDay, h, m, s);
         nType = timer::em_week;
 
@@ -250,6 +290,10 @@ void CRemindingDlg::OnBnClickedButtonAdd()
         int h = t.GetHour();
         int m = t.GetMinute();
         int s = t.GetSecond();
+        stLocal.wHour = h;
+        stLocal.wMinute = m;
+        stLocal.wSecond = s;
+        stLocal.wDay = _tstol(szDay);
         szDescription.Format(_T("%s号 %d时%d分%d秒"), szDay, h, m, s);
         nType = timer::em_month;
     }
@@ -264,9 +308,11 @@ void CRemindingDlg::OnBnClickedButtonAdd()
     m_wndList.SetItemText(0, 2, szRemark);
 
     spTimer sp = std::make_shared<timer>();
-    sp->type = nType;
-    sp->time = t;
-    sp->szRemark = szRemark;
+    
+    sp->Set(nType, stLocal, szRemark);
+    
+    __time64_t next = sp->WillRing();
+
     int index = m_timerManager.AddTimer(sp);
     m_wndList.SetItemData(0, (DWORD_PTR)index);
 

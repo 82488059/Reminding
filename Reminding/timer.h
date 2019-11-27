@@ -3,14 +3,36 @@
 #include <map>
 #include <memory>
 
+int GetTimeZone();
+int GetThisMonthDays();
+int GetMonthDays(int year, int month);
 
-struct timer
+
+class timer
 {
+public:
     enum {em_unknow, em_hour, em_day, em_week, em_month};
-    int type{ em_unknow };
-    CTime time;
-    CString szRemark;
-    int flags{0};
+    void Set(int type, SYSTEMTIME& time, const CString& remark, int flags = 0)
+    {
+        m_type = type;
+        m_time = time;
+        m_szRemark = remark;
+        m_flags = flags;
+        m_update = true;
+    }
+
+    __time64_t WillRing();
+
+
+private:
+    int m_type{ em_unknow };
+    int m_flags{ 0 };
+    bool m_update{ true };
+    SYSTEMTIME m_time;
+    __time64_t m_nextTime;
+    CString m_szRemark;
+private:
+
 };
 
 typedef std::shared_ptr<timer> spTimer;
@@ -33,10 +55,7 @@ public:
         return m_index;
     }
 
-    int AnalysisTimer()
-    {
-        return 0;
-    }
+    int AnalysisTimer();
 private:
     int m_index{ 0 };
     std::map<int, spTimer> m_map;
