@@ -277,7 +277,7 @@ void CRemindingDlg::OnBnClickedButtonAdd()
         }
         else if (szDay == _T("星期日"))
         {
-            stLocal.wDayOfWeek = 7;
+            stLocal.wDayOfWeek = 0;
         }
 
         szDescription.Format(_T("%s %d时%d分%d秒"), szDay, h, m, s);

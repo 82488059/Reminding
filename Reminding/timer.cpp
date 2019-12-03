@@ -75,10 +75,23 @@ __time64_t timer::WillRing()
         {
             nday = m_time.wDayOfWeek + 7 - week;
         }
-        else
+        else if (week < m_time.wDayOfWeek)
         {
             nday = m_time.wDayOfWeek - week;
         }
+        else if (week == m_time.wDayOfWeek)
+        {
+            if (stLocal.wHour * 60 * 60 + stLocal.wMinute * 60 + stLocal.wSecond
+                > m_time.wHour * 60 * 60 + m_time.wMinute * 60 + m_time.wSecond)
+            {
+                nday = m_time.wDayOfWeek + 7 - week;
+            }
+            else
+            {
+                nday = m_time.wDayOfWeek - week;
+            }
+        }
+
         DWORD nsec = nday * 24 * 60*60
             + m_time.wHour * 60 * 60 + m_time.wMinute * 60 + m_time.wSecond 
             - timezone*3600;
