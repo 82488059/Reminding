@@ -105,8 +105,30 @@ __time64_t timer::WillRing()
 
     case em_month:
     {
+        int nextMonth = stLocal.wMonth;
         int nDay = GetThisMonthDays();
-        m_time.wDay > nDay;
+        // SYSTEMTIME nextLocal;
+        // memset(&nextLocal, 0, sizeof(nextLocal));
+        if (nDay >= m_time.wDay 
+            && stLocal.wDay * 24 * 60 * 60  + stLocal.wHour * 60 * 60 + stLocal.wMinute * 60 + stLocal.wSecond
+                < m_time.wDay * 24 * 60 * 60 + m_time.wHour * 60 * 60 + m_time.wMinute * 60 + m_time.wSecond
+            )
+        {
+            next64 = next64 - (next64 % 86400);
+            next64 += (m_time.wDay - stLocal.wDay) * 24 * 60 * 60 
+                + m_time.wHour * 60 * 60 
+                + m_time.wMinute * 60 
+                + m_time.wSecond
+                - timezone * 3600;
+        }
+        else
+        {
+
+        }
+        CTime t(next64);
+        TRACE(_T("%s\n"), t.Format(_T("%Y-%m-%d %H:%M:%S %w-%A")));
+
+        m_nextTime = next64;
 
         break;
     }

@@ -123,6 +123,7 @@ BOOL CRemindingDlg::OnInitDialog()
     m_wndList.InsertColumn(0, _T("类型"), LVCFMT_LEFT, 100);
     m_wndList.InsertColumn(1, _T("时间"), LVCFMT_LEFT, 200);
     m_wndList.InsertColumn(2, _T("备注"), LVCFMT_LEFT, 100);
+    m_wndList.InsertColumn(3, _T("NextTime"), LVCFMT_LEFT, 100);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -312,6 +313,8 @@ void CRemindingDlg::OnBnClickedButtonAdd()
     sp->Set(nType, stLocal, szRemark);
     
     __time64_t next = sp->WillRing();
+    CTime nexttime(next);
+    m_wndList.SetItemText(0, 3, nexttime.Format(_T("%Y-%m-%d %H:%M:%S")));
 
     int index = m_timerManager.AddTimer(sp);
     m_wndList.SetItemData(0, (DWORD_PTR)index);
