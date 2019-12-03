@@ -79,7 +79,6 @@ __time64_t timer::WillRing()
         {
             nday = m_time.wDayOfWeek - week;
         }
-
         DWORD nsec = nday * 24 * 60*60
             + m_time.wHour * 60 * 60 + m_time.wMinute * 60 + m_time.wSecond 
             - timezone*3600;
