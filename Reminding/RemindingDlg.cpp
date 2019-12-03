@@ -319,6 +319,7 @@ void CRemindingDlg::OnBnClickedButtonAdd()
     int index = m_timerManager.AddTimer(sp);
     m_wndList.SetItemData(0, (DWORD_PTR)index);
 
+    m_timerManager.Sort();
 }
 
 

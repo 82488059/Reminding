@@ -10,8 +10,26 @@ int CTimerManager::AnalysisTimer()
     return 0;
 }
 
+int aaaa(const spTimer a, const spTimer b)
+{
+    return a->WillRing() - b->WillRing();
+}
+
+int CTimerManager::Sort()
+{
+    m_list.sort([](const spTimer a, const spTimer b) { 
+        return a->WillRing() - b->WillRing();
+        });
+    return 0;
+}
+
 __time64_t timer::WillRing()
 {
+    if (!m_update)
+    {
+        return m_nextTime;
+    }
+    m_update = false;
     CTime now = CTime::GetCurrentTime();
 
     static int timezone = GetTimeZone();

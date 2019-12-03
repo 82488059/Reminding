@@ -2,6 +2,8 @@
 #include <windows.h>
 #include <map>
 #include <memory>
+#include <list>
+
 
 int GetTimeZone();
 int GetThisMonthDays();
@@ -18,6 +20,10 @@ public:
         m_time = time;
         m_szRemark = remark;
         m_flags = flags;
+        m_update = true;
+    }
+    void Update()
+    {
         m_update = true;
     }
 
@@ -56,7 +62,11 @@ public:
     }
 
     int AnalysisTimer();
+
+    int Sort();
+
 private:
     int m_index{ 0 };
     std::map<int, spTimer> m_map;
+    std::list<spTimer> m_list;
 };
