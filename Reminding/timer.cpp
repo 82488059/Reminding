@@ -105,7 +105,6 @@ __time64_t timer::WillRing()
 
     case em_month:
     {
-        int nextMonth = stLocal.wMonth;
         int nDay = GetThisMonthDays();
         // SYSTEMTIME nextLocal;
         // memset(&nextLocal, 0, sizeof(nextLocal));
@@ -123,7 +122,31 @@ __time64_t timer::WillRing()
         }
         else
         {
-
+            int nextMonth = stLocal.wMonth;
+            int nextYear = stLocal.wYear;
+            nextMonth++;
+            if (nextMonth > 12)
+            {
+                nextMonth = 1;
+                nextYear += 1;
+            }
+            int nDays = 0;
+            while (true)
+            {
+                nDays = GetMonthDays(nextYear, nextMonth);
+                if (nDays >= m_time.wDay)
+                {
+                    break;
+                }
+                nextMonth++;
+                if (nextMonth > 12)
+                {
+                    nextMonth = 1;
+                    nextYear += 1;
+                }
+            }
+            CTime t(nextYear, nextMonth, m_time.wDay, m_time.wHour, m_time.wMinute, m_time.wSecond);
+            next64 = t.GetTime();
         }
         CTime t(next64);
         TRACE(_T("%s\n"), t.Format(_T("%Y-%m-%d %H:%M:%S %w-%A")));
