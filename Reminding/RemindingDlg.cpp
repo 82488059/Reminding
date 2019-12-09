@@ -320,6 +320,8 @@ void CRemindingDlg::OnBnClickedButtonAdd()
     m_wndList.SetItemData(0, (DWORD_PTR)index);
 
     m_timerManager.Sort();
+
+
 }
 
 
@@ -381,4 +383,10 @@ void CRemindingDlg::ChangeList(int type)
         m_weekDay.EnableWindow(FALSE);
         m_weekDay.ResetContent();
     }
+}
+
+void CRemindingDlg::UpdateAlarmClock()
+{
+    m_timerManager.AnalysisTimer();
+    m_timerManager.Sort();
 }

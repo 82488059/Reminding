@@ -61,7 +61,7 @@ public:
         return m_index;
     }
 
-    int AnalysisTimer();
+    int AnalysisTimer(bool flag = false);
 
     int Sort();
 

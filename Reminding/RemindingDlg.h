@@ -50,4 +50,5 @@ public:
     afx_msg void OnBnClickedButtonExit();
 
     void ChangeList(int type);
+    void UpdateAlarmClock();
 };

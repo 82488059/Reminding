@@ -3,10 +3,16 @@
 #include <time.h>
 
 
-int CTimerManager::AnalysisTimer()
+int CTimerManager::AnalysisTimer(bool flag)
 {
-
-
+    for (auto& it : m_list)
+    {
+        if (flag)
+        {
+            it->Update();
+        }
+        it->WillRing();
+    }
     return 0;
 }
 
