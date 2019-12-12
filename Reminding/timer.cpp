@@ -18,7 +18,7 @@ int CTimerManager::AnalysisTimer(bool flag)
 
 int aaaa(const spTimer a, const spTimer b)
 {
-    return a->WillRing() - b->WillRing();
+    return int (a->WillRing() - b->WillRing());
 }
 
 int CTimerManager::Sort()

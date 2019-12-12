@@ -74,6 +74,7 @@ BEGIN_MESSAGE_MAP(CRemindingDlg, CDialogEx)
     ON_BN_CLICKED(IDC_BUTTON_DEL, &CRemindingDlg::OnBnClickedButtonDel)
     ON_BN_CLICKED(IDC_BUTTON_EXIT, &CRemindingDlg::OnBnClickedButtonExit)
     ON_CBN_SELCHANGE(IDC_COMBO3, &CRemindingDlg::OnCbnSelchangeCombo3)
+    ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -124,6 +125,8 @@ BOOL CRemindingDlg::OnInitDialog()
     m_wndList.InsertColumn(1, _T("时间"), LVCFMT_LEFT, 200);
     m_wndList.InsertColumn(2, _T("备注"), LVCFMT_LEFT, 100);
     m_wndList.InsertColumn(3, _T("NextTime"), LVCFMT_LEFT, 100);
+
+    SetTimer(emtimer_1s, 1000, NULL);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -294,7 +297,7 @@ void CRemindingDlg::OnBnClickedButtonAdd()
         stLocal.wHour = h;
         stLocal.wMinute = m;
         stLocal.wSecond = s;
-        stLocal.wDay = _tstol(szDay);
+        stLocal.wDay = (WORD)_tstol(szDay);
         szDescription.Format(_T("%s号 %d时%d分%d秒"), szDay, h, m, s);
         nType = timer::em_month;
     }
@@ -389,4 +392,22 @@ void CRemindingDlg::UpdateAlarmClock()
 {
     m_timerManager.AnalysisTimer();
     m_timerManager.Sort();
+}
+
+
+void CRemindingDlg::OnTimer(UINT_PTR nIDEvent)
+{
+    // TODO: 在此添加消息处理程序代码和/或调用默认值
+    switch (nIDEvent)
+    {
+    case emtimer_1s:
+
+        break;
+    default:
+        break;
+    }
+
+
+
+    CDialogEx::OnTimer(nIDEvent);
 }

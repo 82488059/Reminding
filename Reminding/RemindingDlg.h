@@ -51,4 +51,6 @@ public:
 
     void ChangeList(int type);
     void UpdateAlarmClock();
+    enum {emtimer_1s = 1};
+    afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

@@ -34,11 +34,10 @@ private:
     int m_type{ em_unknow };
     int m_flags{ 0 };
     bool m_update{ true };
-    SYSTEMTIME m_time;
-    __time64_t m_nextTime;
+    SYSTEMTIME m_time{ 0 };
+    __time64_t m_nextTime{ 0 };
     CString m_szRemark;
 private:
-
 };
 
 typedef std::shared_ptr<timer> spTimer;
