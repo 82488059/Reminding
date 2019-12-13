@@ -435,7 +435,7 @@ void CRemindingDlg::OnTimer(UINT_PTR nIDEvent)
         if (timer)
         {
             long dt = CTime::GetCurrentTime().GetTime() - timer->WillRing();
-            if (dt < 0)
+            if (dt <= 0)
             {
                 ::SetWindowPos(m_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
                 timer->Update();

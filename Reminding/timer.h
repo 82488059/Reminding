@@ -3,6 +3,8 @@
 #include <map>
 #include <memory>
 #include <list>
+#include <condition_variable>
+#include <mutex>
 
 
 class CTimer
@@ -32,6 +34,17 @@ public:
             && m_time.wMinute == rTime.wMinute
             && m_time.wSecond == rTime.wSecond
             && m_time.wDayOfWeek == rTime.wDayOfWeek;
+    }
+    void Start(std::function<void()> task)
+    {
+        //std::thread([this, task]() {
+        //    long dt = this->WillRing() - CTime::GetCurrentTime().GetTime();
+        //    if (dt > 0)
+        //        std::this_thread::sleep_for(std::chrono::seconds(dt));
+        //    task();
+        //    }
+        //).detach();
+
     }
 private:
     int m_type{ em_unknow };
