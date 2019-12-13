@@ -1,40 +1,50 @@
 #pragma once
-#include <windows.h>
+
 #include <map>
 #include <memory>
+#include <list>
 
 
-struct timer
+class timer
 {
-    enum {em_unknow, em_hour, em_day, em_week, em_month};
-    int type{ em_unknow };
-    CTime time;
-    CString szRemark;
-    int flags{0};
+public:
+    enum { em_unknow, em_hour, em_day, em_week, em_month };
+    void Set(int type, SYSTEMTIME& time, const CString& remark, int flags = 0)
+    {
+        m_type = type;
+        m_time = time;
+        m_szRemark = remark;
+        m_flags = flags;
+        m_update = true;
+    }
+    void Update()
+    {
+        m_update = true;
+    }
+    __time64_t WillRing();
+    int Type() const { return m_type; }
+    const SYSTEMTIME& Time()const { return m_time; }
+    bool operator == (const SYSTEMTIME& rTime) {
+        return m_time.wYear == rTime.wYear
+            && m_time.wMonth == rTime.wMonth
+            && m_time.wDay == rTime.wDay
+            && m_time.wHour == rTime.wHour
+            && m_time.wMinute == rTime.wMinute
+            && m_time.wSecond == rTime.wSecond
+            && m_time.wDayOfWeek == rTime.wDayOfWeek;
+    }
+private:
+    int m_type{ em_unknow };
+    int m_flags{ 0 };
+    bool m_update{ true };
+    SYSTEMTIME m_time{ 0 };
+    __time64_t m_nextTime{ 0 };
+    CString m_szRemark;
+private:
 };
 
 typedef std::shared_ptr<timer> spTimer;
 
-
-class CTimerManager {
-
-public:
-
-    void RemoveTimer(int index)
-    {
-        m_map.erase(index);
-    }
-    int AddTimer(spTimer sp)
-    {
-        m_index++;
-
-        m_map[m_index] = sp;
-
-        return m_index;
-    }
-
-    
-private:
-    int m_index{ 0 };
-    std::map<int, spTimer> m_map;
-};
+int GetTimeZone();
+int GetThisMonthDays();
+int GetMonthDays(int year, int month);

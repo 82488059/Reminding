@@ -74,6 +74,8 @@ BEGIN_MESSAGE_MAP(CRemindingDlg, CDialogEx)
     ON_BN_CLICKED(IDC_BUTTON_DEL, &CRemindingDlg::OnBnClickedButtonDel)
     ON_BN_CLICKED(IDC_BUTTON_EXIT, &CRemindingDlg::OnBnClickedButtonExit)
     ON_CBN_SELCHANGE(IDC_COMBO3, &CRemindingDlg::OnCbnSelchangeCombo3)
+    ON_WM_TIMER()
+    ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 
@@ -120,9 +122,34 @@ BOOL CRemindingDlg::OnInitDialog()
         | LVS_AUTOARRANGE | LVS_EX_FULLROWSELECT 
         | LVS_SHOWSELALWAYS);
 
-    m_wndList.InsertColumn(0, _T("类型"), LVCFMT_LEFT, 100);
-    m_wndList.InsertColumn(1, _T("时间"), LVCFMT_LEFT, 200);
+    m_wndList.InsertColumn(0, _T("类型"), LVCFMT_LEFT, 80);
+    m_wndList.InsertColumn(1, _T("时间"), LVCFMT_LEFT, 140);
     m_wndList.InsertColumn(2, _T("备注"), LVCFMT_LEFT, 100);
+    m_wndList.InsertColumn(3, _T("NextTime"), LVCFMT_LEFT, 140);
+
+    SetWindowText(_T("闹钟"));
+
+    SetTimer(emtimer_1s, 1000, NULL);
+    // status bar 
+    if (!m_StatusBar.Create(this))
+    {
+        return -1;
+    }
+    const int StatusBar = 2;
+    UINT array[StatusBar];
+    for (int i = 0; i < StatusBar; i++)
+    {
+        array[i] = WM_USER + 1001 + i;
+    }
+    m_StatusBar.SetIndicators(array, sizeof(array) / sizeof(UINT)); //添加面板
+    m_StatusBar.SetPaneInfo(0, array[0], 0, 50); //设置面板宽度
+    m_StatusBar.SetPaneInfo(1, array[1], 0, 999); //设置面板宽度
+    m_StatusBar.SetPaneText(0, _T("时间"));
+    CString szTime;
+    szTime = CTime::GetCurrentTime().Format(_T("%Y-%m-%d %H:%M:%S"));
+    m_StatusBar.SetPaneText(1, szTime);
+
+    RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);//显示状态栏
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -217,11 +244,16 @@ void CRemindingDlg::OnBnClickedButtonAdd()
 
     int nType = 0;
     CTime t;
+    SYSTEMTIME stLocal;
+    memset(&stLocal, 0, sizeof(stLocal));
+
     if (_T("每小时") == szType)
     {
         m_time.GetTime(t);
         int m = t.GetMinute();
         int s = t.GetSecond();
+        stLocal.wMinute = m;
+        stLocal.wSecond = s;
         szDescription.Format(_T("%d分%d秒"), m, s);
         nType = timer::em_hour;
     }
@@ -231,6 +263,9 @@ void CRemindingDlg::OnBnClickedButtonAdd()
         int h = t.GetHour();
         int m = t.GetMinute();
         int s = t.GetSecond();
+        stLocal.wHour = h;
+        stLocal.wMinute = m;
+        stLocal.wSecond = s;
         szDescription.Format(_T("%d时%d分%d秒"), h, m, s);
         nType = timer::em_day;
     }
@@ -240,6 +275,38 @@ void CRemindingDlg::OnBnClickedButtonAdd()
         int h = t.GetHour();
         int m = t.GetMinute();
         int s = t.GetSecond();
+        stLocal.wHour = h;
+        stLocal.wMinute = m;
+        stLocal.wSecond = s;
+        if (szDay == _T("星期一"))
+        {
+            stLocal.wDayOfWeek = 1;
+        }
+        else if (szDay == _T("星期二"))
+        {
+            stLocal.wDayOfWeek = 2;
+        }
+        else if (szDay == _T("星期三"))
+        {
+            stLocal.wDayOfWeek = 3;
+        }
+        else if (szDay == _T("星期四"))
+        {
+            stLocal.wDayOfWeek = 4;
+        }
+        else if (szDay == _T("星期五"))
+        {
+            stLocal.wDayOfWeek = 5;
+        }
+        else if (szDay == _T("星期六"))
+        {
+            stLocal.wDayOfWeek = 6;
+        }
+        else if (szDay == _T("星期日"))
+        {
+            stLocal.wDayOfWeek = 0;
+        }
+
         szDescription.Format(_T("%s %d时%d分%d秒"), szDay, h, m, s);
         nType = timer::em_week;
 
@@ -250,10 +317,19 @@ void CRemindingDlg::OnBnClickedButtonAdd()
         int h = t.GetHour();
         int m = t.GetMinute();
         int s = t.GetSecond();
+        stLocal.wHour = h;
+        stLocal.wMinute = m;
+        stLocal.wSecond = s;
+        stLocal.wDay = (WORD)_tstol(szDay);
         szDescription.Format(_T("%s号 %d时%d分%d秒"), szDay, h, m, s);
         nType = timer::em_month;
     }
     else
+    {
+        return;
+    }
+
+    if (m_timerManager.exist(nType, stLocal))
     {
         return;
     }
@@ -264,12 +340,17 @@ void CRemindingDlg::OnBnClickedButtonAdd()
     m_wndList.SetItemText(0, 2, szRemark);
 
     spTimer sp = std::make_shared<timer>();
-    sp->type = nType;
-    sp->time = t;
-    sp->szRemark = szRemark;
+    
+    sp->Set(nType, stLocal, szRemark);
+    
+    __time64_t next = sp->WillRing();
+    CTime nexttime(next);
+    m_wndList.SetItemText(0, 3, nexttime.Format(_T("%Y-%m-%d %H:%M:%S")));
+
     int index = m_timerManager.AddTimer(sp);
     m_wndList.SetItemData(0, (DWORD_PTR)index);
 
+    m_timerManager.AnalysisTimer();
 }
 
 
@@ -331,4 +412,54 @@ void CRemindingDlg::ChangeList(int type)
         m_weekDay.EnableWindow(FALSE);
         m_weekDay.ResetContent();
     }
+}
+
+void CRemindingDlg::UpdateAlarmClock()
+{
+    m_timerManager.AnalysisTimer();
+    m_timerManager.Sort();
+}
+
+
+void CRemindingDlg::OnTimer(UINT_PTR nIDEvent)
+{
+    // TODO: 在此添加消息处理程序代码和/或调用默认值
+    switch (nIDEvent)
+    {
+    case emtimer_1s:
+    {
+        CString szTime;
+        szTime = CTime::GetCurrentTime().Format(_T("%Y-%m-%d %H:%M:%S"));
+        m_StatusBar.SetPaneText(1, szTime);
+        spTimer timer = m_timerManager.NextTimer();
+        if (timer)
+        {
+            long dt = CTime::GetCurrentTime().GetTime() - timer->WillRing();
+            if (dt < 0)
+            {
+                ::SetWindowPos(m_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+                timer->Update();
+                timer->WillRing();
+                m_timerManager.AnalysisTimer();
+            }
+        }
+    }
+        break;
+    default:
+        break;
+    }
+
+
+
+    CDialogEx::OnTimer(nIDEvent);
+}
+
+
+void CRemindingDlg::OnSize(UINT nType, int cx, int cy)
+{
+    CDialogEx::OnSize(nType, cx, cy);
+
+    // TODO: 在此处添加消息处理程序代码
+
+    RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
 }

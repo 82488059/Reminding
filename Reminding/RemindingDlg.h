@@ -3,7 +3,7 @@
 //
 
 #pragma once
-#include "timer.h"
+#include "timerManager.h"
 #include <map>
 
 
@@ -42,6 +42,7 @@ protected:
 
     CTimerManager m_timerManager;
 
+    CStatusBar m_StatusBar;
 public:
     afx_msg void OnCbnSelchangeCombo1();
     afx_msg void OnCbnSelchangeCombo3();
@@ -50,4 +51,8 @@ public:
     afx_msg void OnBnClickedButtonExit();
 
     void ChangeList(int type);
+    void UpdateAlarmClock();
+    enum {emtimer_1s = 1};
+    afx_msg void OnTimer(UINT_PTR nIDEvent);
+    afx_msg void OnSize(UINT nType, int cx, int cy);
 };
