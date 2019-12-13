@@ -55,7 +55,7 @@ int GetMonthDays(int year, int month)
 }
 
 
-__time64_t timer::WillRing()
+__time64_t CTimer::WillRing()
 {
     if (!m_update)
     {

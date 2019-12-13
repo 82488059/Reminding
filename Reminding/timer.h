@@ -5,7 +5,7 @@
 #include <list>
 
 
-class timer
+class CTimer
 {
 public:
     enum { em_unknow, em_hour, em_day, em_week, em_month };
@@ -43,7 +43,7 @@ private:
 private:
 };
 
-typedef std::shared_ptr<timer> spTimer;
+typedef std::shared_ptr<CTimer> spTimer;
 
 int GetTimeZone();
 int GetThisMonthDays();

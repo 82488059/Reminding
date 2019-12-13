@@ -255,7 +255,7 @@ void CRemindingDlg::OnBnClickedButtonAdd()
         stLocal.wMinute = m;
         stLocal.wSecond = s;
         szDescription.Format(_T("%d分%d秒"), m, s);
-        nType = timer::em_hour;
+        nType = CTimer::em_hour;
     }
     else if (_T("每天") == szType)
     {
@@ -267,7 +267,7 @@ void CRemindingDlg::OnBnClickedButtonAdd()
         stLocal.wMinute = m;
         stLocal.wSecond = s;
         szDescription.Format(_T("%d时%d分%d秒"), h, m, s);
-        nType = timer::em_day;
+        nType = CTimer::em_day;
     }
     else if (_T("每周") == szType)
     {
@@ -308,7 +308,7 @@ void CRemindingDlg::OnBnClickedButtonAdd()
         }
 
         szDescription.Format(_T("%s %d时%d分%d秒"), szDay, h, m, s);
-        nType = timer::em_week;
+        nType = CTimer::em_week;
 
     }
     else if (_T("每月") == szType)
@@ -322,7 +322,7 @@ void CRemindingDlg::OnBnClickedButtonAdd()
         stLocal.wSecond = s;
         stLocal.wDay = (WORD)_tstol(szDay);
         szDescription.Format(_T("%s号 %d时%d分%d秒"), szDay, h, m, s);
-        nType = timer::em_month;
+        nType = CTimer::em_month;
     }
     else
     {
@@ -339,7 +339,7 @@ void CRemindingDlg::OnBnClickedButtonAdd()
     m_wndList.SetItemText(0, 1, szDescription);
     m_wndList.SetItemText(0, 2, szRemark);
 
-    spTimer sp = std::make_shared<timer>();
+    spTimer sp = std::make_shared<CTimer>();
     
     sp->Set(nType, stLocal, szRemark);
     
