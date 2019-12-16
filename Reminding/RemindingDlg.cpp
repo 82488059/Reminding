@@ -6,11 +6,12 @@
 #include "Reminding.h"
 #include "RemindingDlg.h"
 #include "afxdialogex.h"
+#include <mmsystem.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-
+#pragma comment(lib, "winmm.lib")
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -447,10 +448,11 @@ void CRemindingDlg::OnTimer(UINT_PTR nIDEvent)
                 m_timerManager.AnalysisTimer();
                 CString szText;
                 szText.Format(_T("%s"), timer->Remark());
+                PlaySound(_T("SystemStart"), NULL, SND_ALIAS | SND_ASYNC);
                 MessageBox(szText, _T("闹钟"), MB_OK);
+                PlaySound(NULL, NULL, SND_FILENAME);
                 // 取消置顶
                 ::SetWindowPos(m_hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-
             }
         }
     }
