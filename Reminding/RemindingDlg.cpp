@@ -333,7 +333,10 @@ void CRemindingDlg::OnBnClickedButtonAdd()
     {
         return;
     }
-
+    if (szRemark.IsEmpty())
+    {
+        szRemark = _T("定时提醒：") + szDescription;
+    }
     m_wndList.InsertItem(0, _T(""));
     m_wndList.SetItemText(0, 0, szType);
     m_wndList.SetItemText(0, 1, szDescription);
@@ -371,7 +374,7 @@ void CRemindingDlg::OnBnClickedButtonDel()
 void CRemindingDlg::OnBnClickedButtonExit()
 {
     // TODO: 在此添加控件通知处理程序代码
-    OnClose();
+    OnOK();
 }
 
 
@@ -435,12 +438,19 @@ void CRemindingDlg::OnTimer(UINT_PTR nIDEvent)
         if (timer)
         {
             long dt = CTime::GetCurrentTime().GetTime() - timer->WillRing();
-            if (dt <= 0)
+            if (dt >= 0)
             {
-                ::SetWindowPos(m_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+                // 置顶
+                ::SetWindowPos(m_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
                 timer->Update();
                 timer->WillRing();
                 m_timerManager.AnalysisTimer();
+                CString szText;
+                szText.Format(_T("%s"), timer->Remark());
+                MessageBox(szText, _T("闹钟"), MB_OK);
+                // 取消置顶
+                ::SetWindowPos(m_hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+
             }
         }
     }

@@ -44,8 +44,8 @@ public:
         //    task();
         //    }
         //).detach();
-
     }
+    const CString& Remark() const { return m_szRemark; }
 private:
     int m_type{ em_unknow };
     int m_flags{ 0 };
