@@ -1,35 +1,61 @@
 #include "stdafx.h"
-#include "timer.h"
-#include <time.h>
+#include "Timer.h"
 
-
-int CTimerManager::AnalysisTimer(bool flag)
+int GetTimeZone()
 {
-    for (auto& it : m_list)
+    static int n = ~0;
+    if (~0 == n)
     {
-        if (flag)
-        {
-            it->Update();
-        }
-        it->WillRing();
+        SYSTEMTIME t1, t2;
+        GetLocalTime(&t1);
+        GetSystemTime(&t2);
+        n = t1.wHour - t2.wHour;
     }
-    return 0;
+    return n;
 }
 
-int aaaa(const spTimer a, const spTimer b)
+int GetThisMonthDays()
 {
-    return int (a->WillRing() - b->WillRing());
+    COleDateTime time, nextMonth;
+    SYSTEMTIME stLocal;
+    GetLocalTime(&stLocal);
+    time.GetAsSystemTime(stLocal);
+    time.SetDateTime(time.GetYear(), time.GetMonth(), 1, 0, 0, 0);
+    if (time.GetMonth() >= 12)
+    {
+        nextMonth.SetDateTime(time.GetYear() + 1, 1, 1, 0, 0, 0);
+    }
+    else
+    {
+        nextMonth.SetDateTime(time.GetYear(), time.GetMonth() + 1, 1, 0, 0, 0);
+    }
+    COleDateTimeSpan ts = nextMonth - time;
+    return ts.GetDays();
 }
 
-int CTimerManager::Sort()
+int GetMonthDays(int year, int month)
 {
-    m_list.sort([](const spTimer a, const spTimer b) { 
-        return a->WillRing() - b->WillRing();
-        });
-    return 0;
+    if (month > 12 || month < 1)
+    {
+        return -1;
+    }
+    COleDateTime time, nextMonth;
+    time.SetDateTime(year, month, 1, 0, 0, 0);
+
+    if (time.GetMonth() >= 12)
+    {
+        nextMonth.SetDateTime(time.GetYear() + 1, 1, 1, 0, 0, 0);
+    }
+    else
+    {
+        nextMonth.SetDateTime(time.GetYear(), time.GetMonth() + 1, 1, 0, 0, 0);
+    }
+    COleDateTimeSpan ts = nextMonth - time;
+    return ts.GetDays();
 }
 
-__time64_t timer::WillRing()
+
+__time64_t CTimer::WillRing()
 {
     if (!m_update)
     {
@@ -106,7 +132,7 @@ __time64_t timer::WillRing()
         else if (week == m_time.wDayOfWeek)
         {
             if (stLocal.wHour * 60 * 60 + stLocal.wMinute * 60 + stLocal.wSecond
-                > m_time.wHour * 60 * 60 + m_time.wMinute * 60 + m_time.wSecond)
+        > m_time.wHour * 60 * 60 + m_time.wMinute * 60 + m_time.wSecond)
             {
                 nday = m_time.wDayOfWeek + 7 - week;
             }
@@ -116,9 +142,9 @@ __time64_t timer::WillRing()
             }
         }
 
-        DWORD nsec = nday * 24 * 60*60
-            + m_time.wHour * 60 * 60 + m_time.wMinute * 60 + m_time.wSecond 
-            - timezone*3600;
+        DWORD nsec = nday * 24 * 60 * 60
+            + m_time.wHour * 60 * 60 + m_time.wMinute * 60 + m_time.wSecond
+            - timezone * 3600;
         next64 += nsec;
         CTime t(next64);
         TRACE(_T("%s\n"), t.Format(_T("%Y-%m-%d %H:%M:%S %w-%A")));
@@ -132,15 +158,15 @@ __time64_t timer::WillRing()
         int nDay = GetThisMonthDays();
         // SYSTEMTIME nextLocal;
         // memset(&nextLocal, 0, sizeof(nextLocal));
-        if (nDay >= m_time.wDay 
-            && stLocal.wDay * 24 * 60 * 60  + stLocal.wHour * 60 * 60 + stLocal.wMinute * 60 + stLocal.wSecond
-                < m_time.wDay * 24 * 60 * 60 + m_time.wHour * 60 * 60 + m_time.wMinute * 60 + m_time.wSecond
+        if (nDay >= m_time.wDay
+            && stLocal.wDay * 24 * 60 * 60 + stLocal.wHour * 60 * 60 + stLocal.wMinute * 60 + stLocal.wSecond
+            < m_time.wDay * 24 * 60 * 60 + m_time.wHour * 60 * 60 + m_time.wMinute * 60 + m_time.wSecond
             )
         {
             next64 = next64 - (next64 % 86400);
-            next64 += (m_time.wDay - stLocal.wDay) * 24 * 60 * 60 
-                + m_time.wHour * 60 * 60 
-                + m_time.wMinute * 60 
+            next64 += (m_time.wDay - stLocal.wDay) * 24 * 60 * 60
+                + m_time.wHour * 60 * 60
+                + m_time.wMinute * 60
                 + m_time.wSecond
                 - timezone * 3600;
         }
@@ -185,57 +211,4 @@ __time64_t timer::WillRing()
         break;
     }
     return m_nextTime;
-}
-
-int GetTimeZone()
-{
-    static int n = ~0;
-    if (~0 == n)
-    {
-        SYSTEMTIME t1, t2;
-        GetLocalTime(&t1);
-        GetSystemTime(&t2);
-        n = t1.wHour - t2.wHour;
-    }
-    return n;
-}
-
-int GetThisMonthDays()
-{
-    COleDateTime time, nextMonth;
-    SYSTEMTIME stLocal;
-    GetLocalTime(&stLocal);
-    time.GetAsSystemTime(stLocal);
-    time.SetDateTime(time.GetYear(), time.GetMonth(), 1, 0, 0, 0);
-    if (time.GetMonth() >= 12)
-    {
-        nextMonth.SetDateTime(time.GetYear() + 1, 1, 1, 0, 0, 0);
-    }
-    else
-    {
-        nextMonth.SetDateTime(time.GetYear(), time.GetMonth() + 1, 1, 0, 0, 0);
-    }
-    COleDateTimeSpan ts = nextMonth - time;
-    return ts.GetDays();
-}
-
-int GetMonthDays(int year, int month)
-{
-    if (month > 12 || month < 1)
-    {
-        return -1;
-    }
-    COleDateTime time, nextMonth;
-    time.SetDateTime(year, month, 1, 0, 0, 0);
-
-    if (time.GetMonth() >= 12)
-    {
-        nextMonth.SetDateTime(time.GetYear() + 1, 1, 1, 0, 0, 0);
-    }
-    else
-    {
-        nextMonth.SetDateTime(time.GetYear(), time.GetMonth() + 1, 1, 0, 0, 0);
-    }
-    COleDateTimeSpan ts = nextMonth - time;
-    return ts.GetDays();
 }

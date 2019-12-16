@@ -183,7 +183,8 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="timer.h" />
+    <ClInclude Include="Timer.h" />
+    <ClInclude Include="timerManager.h" />
     <ClInclude Include="Reminding.h" />
     <ClInclude Include="RemindingDlg.h" />
     <ClInclude Include="Resource.h" />
@@ -191,6 +192,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Reminding.cpp" />
     <ClCompile Include="RemindingDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -199,7 +201,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="timer.cpp" />
+    <ClCompile Include="timerManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Reminding.rc" />

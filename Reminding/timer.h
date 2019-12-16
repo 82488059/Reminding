@@ -1,19 +1,16 @@
 #pragma once
-#include <windows.h>
+
 #include <map>
 #include <memory>
 #include <list>
+#include <condition_variable>
+#include <mutex>
 
 
-int GetTimeZone();
-int GetThisMonthDays();
-int GetMonthDays(int year, int month);
-
-
-class timer
+class CTimer
 {
 public:
-    enum {em_unknow, em_hour, em_day, em_week, em_month};
+    enum { em_unknow, em_hour, em_day, em_week, em_month };
     void Set(int type, SYSTEMTIME& time, const CString& remark, int flags = 0)
     {
         m_type = type;
@@ -26,10 +23,29 @@ public:
     {
         m_update = true;
     }
-
     __time64_t WillRing();
-
-
+    int Type() const { return m_type; }
+    const SYSTEMTIME& Time()const { return m_time; }
+    bool operator == (const SYSTEMTIME& rTime) {
+        return m_time.wYear == rTime.wYear
+            && m_time.wMonth == rTime.wMonth
+            && m_time.wDay == rTime.wDay
+            && m_time.wHour == rTime.wHour
+            && m_time.wMinute == rTime.wMinute
+            && m_time.wSecond == rTime.wSecond
+            && m_time.wDayOfWeek == rTime.wDayOfWeek;
+    }
+    void Start(std::function<void()> task)
+    {
+        //std::thread([this, task]() {
+        //    long dt = this->WillRing() - CTime::GetCurrentTime().GetTime();
+        //    if (dt > 0)
+        //        std::this_thread::sleep_for(std::chrono::seconds(dt));
+        //    task();
+        //    }
+        //).detach();
+    }
+    const CString& Remark() const { return m_szRemark; }
 private:
     int m_type{ em_unknow };
     int m_flags{ 0 };
@@ -40,32 +56,8 @@ private:
 private:
 };
 
-typedef std::shared_ptr<timer> spTimer;
+typedef std::shared_ptr<CTimer> spTimer;
 
-
-class CTimerManager {
-
-public:
-
-    void RemoveTimer(int index)
-    {
-        m_map.erase(index);
-    }
-    int AddTimer(spTimer sp)
-    {
-        m_index++;
-
-        m_map[m_index] = sp;
-
-        return m_index;
-    }
-
-    int AnalysisTimer(bool flag = false);
-
-    int Sort();
-
-private:
-    int m_index{ 0 };
-    std::map<int, spTimer> m_map;
-    std::list<spTimer> m_list;
-};
+int GetTimeZone();
+int GetThisMonthDays();
+int GetMonthDays(int year, int month);
