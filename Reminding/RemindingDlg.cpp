@@ -478,7 +478,7 @@ void CRemindingDlg::OnSize(UINT nType, int cx, int cy)
 
     if (SIZE_MINIMIZED == nType)
     {
-        // 最小华 
+        // 最小化
         ShowNotifyIcon(TRUE);
         ShowWindow(SW_HIDE);
     }
