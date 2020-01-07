@@ -464,7 +464,6 @@ void CRemindingDlg::OnTimer(UINT_PTR nIDEvent)
     default:
         break;
     }
-
     CDialogEx::OnTimer(nIDEvent);
 }
 
