@@ -43,6 +43,8 @@ protected:
     CTimerManager m_timerManager;
 
     CStatusBar m_StatusBar;
+    // NOTIFYICON
+    NOTIFYICONDATA m_notifyIconData{ 0 };
 public:
     afx_msg void OnCbnSelchangeCombo1();
     afx_msg void OnCbnSelchangeCombo3();
@@ -55,4 +57,10 @@ public:
     enum {emtimer_1s = 1};
     afx_msg void OnTimer(UINT_PTR nIDEvent);
     afx_msg void OnSize(UINT nType, int cx, int cy);
+    BOOL InitNotifyIcon();
+    BOOL ShowNotifyIcon(BOOL bShow);
+    afx_msg LRESULT NotifyIconCallBack(WPARAM wParam, LPARAM lParam);
+    afx_msg LRESULT NotifyIconMesgRestore(WPARAM wParam, LPARAM lParam);
+
+    afx_msg void OnDestroy();
 };

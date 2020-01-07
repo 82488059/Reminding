@@ -77,6 +77,9 @@ BEGIN_MESSAGE_MAP(CRemindingDlg, CDialogEx)
     ON_CBN_SELCHANGE(IDC_COMBO3, &CRemindingDlg::OnCbnSelchangeCombo3)
     ON_WM_TIMER()
     ON_WM_SIZE()
+    ON_WM_DESTROY()
+    ON_MESSAGE(WM_NOTIFY_MESSAGE, NotifyIconCallBack)
+    ON_MESSAGE(WM_NOTIFY_MESGRESTORE, NotifyIconMesgRestore)
 END_MESSAGE_MAP()
 
 
@@ -152,6 +155,7 @@ BOOL CRemindingDlg::OnInitDialog()
 
     RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);//显示状态栏
 
+    InitNotifyIcon();
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -474,4 +478,97 @@ void CRemindingDlg::OnSize(UINT nType, int cx, int cy)
     // TODO: 在此处添加消息处理程序代码
 
     RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
+
+    if (SIZE_MINIMIZED == nType)
+    {
+        // 最小华 
+        ShowNotifyIcon(TRUE);
+        ShowWindow(SW_HIDE);
+    }
+}
+
+BOOL CRemindingDlg::InitNotifyIcon()
+{
+    // Add a Shell_NotifyIcon notificaion
+    m_notifyIconData.cbSize = sizeof(m_notifyIconData);
+    m_notifyIconData.uID = IDR_MAINFRAME;      // Per Windows Embedded CE docs, values from 0 to 12 are reserved and should not be used.
+    m_notifyIconData.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+    m_notifyIconData.hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME));
+    m_notifyIconData.uCallbackMessage = WM_NOTIFY_MESSAGE;
+    lstrcpy(m_notifyIconData.szTip, _T("Reminding"));
+    m_notifyIconData.hWnd = m_hWnd;
+    // Add the notification to the tray.
+    Shell_NotifyIcon(NIM_ADD, &m_notifyIconData);
+    // Update the notification icon.
+    // m_notifyIconData.uFlags = NIF_ICON;
+    // m_notifyIconData.hIcon = LoadIcon(g_hInstance, MAKEINTRESOURCE(IDR_MAINFRAME));
+    return 0;
+}
+
+BOOL CRemindingDlg::ShowNotifyIcon(BOOL bShow)
+{
+    BOOL bResult = FALSE;
+    if (bShow)
+    {
+        //bResult = Shell_NotifyIcon(NIM_MODIFY, &m_notifyIconData);
+        bResult = Shell_NotifyIcon(NIM_ADD, &m_notifyIconData);
+    }
+    else
+    {
+        // Remove the notification from the tray.
+        bResult = Shell_NotifyIcon(NIM_DELETE, &m_notifyIconData);
+    }
+    return bResult;
+}
+
+LRESULT CRemindingDlg::NotifyIconCallBack(WPARAM wParam, LPARAM lParam)
+{
+    UINT uID{ wParam };
+    UINT uMouseMsg{ (UINT)lParam };
+
+    switch (uMouseMsg)
+    {
+    case WM_RBUTTONUP:
+    {
+        CMenu popMenu;
+        popMenu.CreatePopupMenu();
+        popMenu.AppendMenu(MF_STRING, IDC_BUTTON_EXIT, _T("退出"));
+        POINT ptMouse;
+        ::GetCursorPos(&ptMouse);
+        ::SetForegroundWindow(m_notifyIconData.hWnd);
+        ::TrackPopupMenu(popMenu.m_hMenu, 0, ptMouse.x, ptMouse.y, 0, m_notifyIconData.hWnd, NULL);
+    }
+    break;
+    case WM_LBUTTONUP:
+    {
+        NotifyIconMesgRestore(0, 0);
+    }
+    break;
+    default:
+    {
+    }
+    break;
+    }
+    return LRESULT();
+}
+
+LRESULT CRemindingDlg::NotifyIconMesgRestore(WPARAM wParam, LPARAM lParam)
+{
+    // 还原到其原始大小并显示窗口
+    ShowWindow(SW_SHOWNORMAL);
+    // 置顶窗口
+    ::SetWindowPos(m_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+    // 删除托盘图标
+    ShowNotifyIcon(FALSE);
+    // SendMessage(WM_SIZE, SIZE_RESTORED, SIZE_RESTORED);
+    return LRESULT();
+}
+
+
+void CRemindingDlg::OnDestroy()
+{
+    CDialogEx::OnDestroy();
+
+    // TODO: 在此处添加消息处理程序代码
+    ShowNotifyIcon(FALSE);
 }
